@@ -3,5 +3,13 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: Ensure Podman RunRoot directory exists
+      ansible.builtin.file:
+        path: /run/user/1000/containers
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0700'
+        
     - name: Ping all hosts
       ansible.builtin.ping:
