@@ -3,14 +3,6 @@
   become: yes
 
   tasks:
-    - name: Ensure Podman RunRoot directory exists
-      ansible.builtin.file:
-        path: /run/user/1000/containers
-        state: directory
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_id }}"
-        mode: '0700'
-
     - name: Update APT cache
       ansible.builtin.apt:
         update_cache: yes
