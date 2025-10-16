@@ -1,0 +1,7 @@
+- name: Ensure Podman RunRoot directory exists on runner node
+  ansible.builtin.file:
+    path: /run/user/1000/containers
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0700'
