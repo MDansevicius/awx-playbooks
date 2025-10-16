@@ -1,7 +1,22 @@
-- name: Ensure Podman RunRoot directory exists on runner node
-  ansible.builtin.file:
-    path: /run/user/1000/containers
-    state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: '0700'
+- name: Prepare rootless Podman environment
+  hosts: runner_node
+  become: yes
+  tasks:
+    - name: Ensure Podman RunRoot directory exists
+      ansible.builtin.file:
+        path: /run/user/1000/containers
+        state: directory
+        owner: awx
+        group: awx
+        mode: '0700'
+
+    - name: Ensure containers.conf exists
+      ansible.builtin.copy:
+        dest: /home/awx/.config/containers/containers.conf
+        content: |
+          [engine]
+          runtime = "crun"
+          cgroup_manager = "cgroupfs"
+        owner: awx
+        group: awx
+        mode: '0644'
