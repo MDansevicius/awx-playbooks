@@ -1,0 +1,22 @@
+---
+- name: Update Ubuntu OS
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600  # Cache galioja 1 valandą
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+
+    - name: Reboot if needed
+      ansible.builtin.reboot:
+        msg: "Rebooting server after updates"
+        reboot_timeout: 600
+        pre_reboot_delay: 5
+        post_reboot_delay: 10
