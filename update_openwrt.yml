@@ -27,16 +27,14 @@
         msg: "{{ upgrade_result.stdout_lines | default('No packages upgraded') }}"
 
     - name: Reboot router
-      raw: "reboot"
+      raw: "nohup reboot >/dev/null 2>&1 &"
       when: upgrade_all
-      async: 1
-      poll: 0
       ignore_errors: yes
 
     - name: Wait for router to come back online
       wait_for:
-        host: "{{ inventory_hostname }}"
-        port: 22
-        delay: 30
-        timeout: 180
+      host: "{{ inventory_hostname }}"
+      port: 22
+      delay: 30
+      timeout: 180
       delegate_to: localhost
