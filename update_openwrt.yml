@@ -1,6 +1,6 @@
 ---
 - name: Update OpenWrt packages
-  hosts: openwrt_routers
+  hosts: all
   gather_facts: no
   become: yes
 

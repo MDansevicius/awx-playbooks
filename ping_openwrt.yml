@@ -1,5 +1,5 @@
 - name: Test connectivity to OpenWrt
-  hosts: openwrt_routers
+  hosts: all
   gather_facts: no
   tasks:
     - name: Ping via shell
