@@ -1,0 +1,11 @@
+- name: Test connectivity to OpenWrt
+  hosts: openwrt_routers
+  gather_facts: no
+  tasks:
+    - name: Ping via shell
+      raw: "ping -c 1 8.8.8.8"
+      register: ping_output
+      ignore_errors: yes
+
+    - debug:
+        msg: "{{ ping_output.stdout }}"
