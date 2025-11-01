@@ -10,20 +10,26 @@
     - name: Test connectivity
       raw: "echo Connection OK"
       register: connectivity
-    - debug:
+
+    - name: Show connectivity result
+      debug:
         msg: "{{ connectivity.stdout }}"
 
     - name: Update package lists
       raw: "opkg update"
       register: update_result
-    - debug:
+
+    - name: Show update output
+      debug:
         msg: "{{ update_result.stdout_lines }}"
 
     - name: Upgrade all packages
       raw: "opkg list-upgradable | cut -f 1 -d ' ' | xargs -r opkg upgrade"
       when: upgrade_all
       register: upgrade_result
-    - debug:
+
+    - name: Show upgrade output
+      debug:
         msg: "{{ upgrade_result.stdout_lines | default('No packages upgraded') }}"
 
     - name: Reboot router
@@ -33,8 +39,8 @@
 
     - name: Wait for router to come back online
       wait_for:
-      host: "{{ inventory_hostname }}"
-      port: 22
-      delay: 30
-      timeout: 180
+        host: "{{ inventory_hostname }}"
+        port: 22
+        delay: 30
+        timeout: 180
       delegate_to: localhost
