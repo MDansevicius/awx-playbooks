@@ -2,38 +2,38 @@
 - name: Update OpenWrt packages
   hosts: all
   gather_facts: no
-  become: yes
-
+  become: no
   vars:
     upgrade_all: true
 
   tasks:
-    - name: Update package lists
-      command: opkg update
-      register: update_result
+    - name: Test connectivity
+      raw: "echo Connection OK"
+      register: connectivity
+    - debug:
+        msg: "{{ connectivity.stdout }}"
 
+    - name: Update package lists
+      raw: "opkg update"
+      register: update_result
     - debug:
         msg: "{{ update_result.stdout_lines }}"
 
     - name: Upgrade all packages
+      raw: "opkg list-upgradable | cut -f 1 -d ' ' | xargs -r opkg upgrade"
       when: upgrade_all
-      command: opkg list-upgradable | cut -f 1 -d ' ' | xargs -r opkg upgrade
       register: upgrade_result
-      changed_when: "'Upgrading' in upgrade_result.stdout or 'Removing' in upgrade_result.stdout"
-      ignore_errors: yes
-
     - debug:
-        msg: "{{ upgrade_result.stdout_lines | default('No packages were upgraded') }}"
+        msg: "{{ upgrade_result.stdout_lines | default('No packages upgraded') }}"
 
-    - name: Reboot router (optional)
+    - name: Reboot router
+      raw: "reboot"
       when: upgrade_all
-      command: reboot
       async: 1
       poll: 0
       ignore_errors: yes
 
     - name: Wait for router to come back online
-      when: upgrade_all
       wait_for:
         host: "{{ inventory_hostname }}"
         port: 22
