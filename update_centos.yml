@@ -1,5 +1,5 @@
 ---
-- name: Update CentOS Stream 10 system packages
+- name: Update and reboot CentOS Stream 10 systems
   hosts: all
   become: true
   gather_facts: true
@@ -10,25 +10,16 @@
         name: "*"
         state: latest
         update_cache: true
-      register: update_result
 
-    - name: Check if reboot is required
-      ansible.builtin.command: dnf needs-restarting -r
-      register: reboot_check
-      failed_when: false
-      changed_when: false
+    - name: Reboot system (do not wait for it to come back)
+      ansible.builtin.shell: |
+        (sleep 5 && reboot) &
+      async: 0
+      poll: 0
+      ignore_errors: true
+      changed_when: true
+      register: reboot_trigger
 
-    - name: Reboot the system if required
-      ansible.builtin.reboot:
-        msg: "Reboot initiated by AWX after system update."
-        connect_timeout: 10
-        reboot_timeout: 900
-        pre_reboot_delay: 0
-        post_reboot_delay: 30
-      when: reboot_check.rc != 0
-
-    - name: Show summary of updated packages
+    - name: Print message
       ansible.builtin.debug:
-        msg: >-
-          Updated packages:
-          {{ update_result.results | map(attribute='name') | list | join(', ') }}
+        msg: "System is rebooting now. Connection will close shortly."
